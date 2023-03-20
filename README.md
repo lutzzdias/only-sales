@@ -1,4 +1,4 @@
-# Onlysales
+# OnlySales
 
 An ecommerce application
 
