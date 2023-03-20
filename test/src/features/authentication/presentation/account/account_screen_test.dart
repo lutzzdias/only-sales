@@ -1,26 +1,17 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:only_sales/src/features/authentication/presentation/account/account_screen.dart';
+
+import '../../auth_robot.dart';
 
 void main() {
   testWidgets(
     'Cancel logout',
     (tester) async {
-      await tester.pumpWidget(
-        const ProviderScope(child: MaterialApp(home: AccountScreen())),
-      );
-      final logoutButton = find.text('Logout');
-      expect(logoutButton, findsOneWidget);
-      await tester.tap(logoutButton);
-      await tester.pump();
-      final dialogTitle = find.text('Are you sure?');
-      expect(dialogTitle, findsOneWidget);
-      final cancelButton = find.text('Cancel');
-      expect(cancelButton, findsOneWidget);
-      await tester.tap(cancelButton);
-      await tester.pump();
-      expect(dialogTitle, findsNothing);
+      final authRobot = AuthRobot(tester);
+      await authRobot.pumpAccountScreen();
+      await authRobot.tapLogoutButton();
+      authRobot.expectLogoutDialogFound();
+      await authRobot.tapCancelButton();
+      authRobot.expectLogoutDialogNotFound();
     },
   );
 }
