@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:only_sales/src/common_widgets/alert_dialogs.dart';
+import 'package:only_sales/src/common_widgets/primary_button.dart';
 import 'package:only_sales/src/features/authentication/data/fake_auth_repository.dart';
 import 'package:only_sales/src/features/authentication/presentation/account/account_screen.dart';
+import 'package:only_sales/src/features/authentication/presentation/sign_in/email_password_sign_in_screen.dart';
+import 'package:only_sales/src/features/authentication/presentation/sign_in/email_password_sign_in_state.dart';
 
 class AuthRobot {
   AuthRobot(this.tester);
@@ -18,6 +21,28 @@ class AuthRobot {
         ],
         child: const MaterialApp(
           home: AccountScreen(),
+        ),
+      ),
+    );
+  }
+
+  Future<void> pumpEmailAndPasswordSignInContents({
+    required FakeAuthRepository authRepository,
+    required EmailPasswordSignInFormType formType,
+    VoidCallback? onSignedIn,
+  }) async {
+    return tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          authRepositoryProvider.overrideWithValue(authRepository),
+        ],
+        child: MaterialApp(
+          home: Scaffold(
+            body: EmailPasswordSignInContents(
+              formType: formType,
+              onSignedIn: onSignedIn,
+            ),
+          ),
         ),
       ),
     );
@@ -41,6 +66,13 @@ class AuthRobot {
     final cancelButton = find.text('Cancel');
     expect(cancelButton, findsOneWidget);
     await tester.tap(cancelButton);
+    await tester.pump();
+  }
+
+  Future<void> tapEmailAndPasswordSubmitButton() async {
+    final primaryButton = find.byType(PrimaryButton);
+    expect(primaryButton, findsOneWidget);
+    await tester.tap(primaryButton);
     await tester.pump();
   }
 
