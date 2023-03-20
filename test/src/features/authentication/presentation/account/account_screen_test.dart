@@ -17,6 +17,7 @@ void main() {
       authRobot.expectLogoutDialogNotFound();
     },
   );
+
   testWidgets(
     'Confirm logout, success',
     (tester) async {
@@ -50,6 +51,32 @@ void main() {
       authRobot.expectLogoutDialogFound();
       await authRobot.tapDialogLogoutButton();
       authRobot.expectErrorAlertFound();
+    },
+  );
+
+  testWidgets(
+    'Confirm logout, loading state',
+    (tester) async {
+      final authRobot = AuthRobot(tester);
+      final authRepository = MockAuthRepository();
+      when(authRepository.signOut).thenAnswer(
+        (_) => Future.delayed(const Duration(seconds: 1)),
+      );
+      when(authRepository.authStateChanges).thenAnswer(
+        (_) => Stream.value(
+          const AppUser(
+            uid: '123',
+            email: 'test@test.com',
+          ),
+        ),
+      );
+      await authRobot.pumpAccountScreen(authRepository: authRepository);
+      await tester.runAsync(() async {
+        await authRobot.tapLogoutButton();
+        authRobot.expectLogoutDialogFound();
+        await authRobot.tapDialogLogoutButton();
+      });
+      authRobot.expectCircularProgressIndicator();
     },
   );
 }
