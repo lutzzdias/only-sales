@@ -38,6 +38,41 @@ void main() {
           );
         },
       );
+
+      testWidgets(
+        '''
+          Given formType is signIn
+          When enter valid email and password
+          And tap on the sign-in button
+          Then signInWithEmailAndPassword is called
+          And onSignedIn callback is called
+          And error alert is not shown
+        ''',
+        (tester) async {
+          var didSignIn = false;
+          final authRobot = AuthRobot(tester);
+          when(() => authRepository.signInWithEmailAndPassword(
+                testEmail,
+                testPassword,
+              )).thenAnswer((_) => Future.value());
+          await authRobot.pumpEmailAndPasswordSignInContents(
+            authRepository: authRepository,
+            formType: EmailPasswordSignInFormType.signIn,
+            onSignedIn: () => didSignIn = true,
+          );
+          await authRobot.enterEmail(testEmail);
+          await authRobot.enterPassword(testPassword);
+          await authRobot.tapEmailAndPasswordSubmitButton();
+          verify(
+            () => authRepository.signInWithEmailAndPassword(
+              testEmail,
+              testPassword,
+            ),
+          ).called(1);
+          expect(didSignIn, true);
+          authRobot.expectErrorAlertNotFound();
+        },
+      );
     },
   );
 }

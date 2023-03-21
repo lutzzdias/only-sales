@@ -76,6 +76,18 @@ class AuthRobot {
     await tester.pump();
   }
 
+  Future<void> enterEmail(String email) async {
+    final emailField = find.byKey(EmailPasswordSignInScreen.emailKey);
+    expect(emailField, findsOneWidget);
+    await tester.enterText(emailField, email);
+  }
+
+  Future<void> enterPassword(String password) async {
+    final passwordField = find.byKey(EmailPasswordSignInScreen.passwordKey);
+    expect(passwordField, findsOneWidget);
+    await tester.enterText(passwordField, password);
+  }
+
   void expectLogoutDialogFound() {
     final dialogTitle = find.text('Are you sure?');
     expect(dialogTitle, findsOneWidget);
